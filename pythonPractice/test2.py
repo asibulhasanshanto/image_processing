@@ -2,14 +2,15 @@ import matplotlib.pyplot as plt
 import cv2
 
 def main():
-	path = './image2.jpg'
+	path = './image1.jpg'
 	image = plt.imread(path)
-	
 	gray_image = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
-	binary = cv2.threshold(gray_image,127,255,cv2.THRESH_BINARY)[1]
+
+	histogram = cv2.calcHist([gray_image],[0],None,[255],[0,255])
+	equalized_image = cv2.equalizeHist(gray_image)
+	histogram_equalized = cv2.calcHist([equalized_image],[0],None,[255],[0,255])
 	
-	histogram = cv2.calcHist([gray_image],[0],None,[255],[0,255])	
-	printer = {'gray image':gray_image,'binary image':binary}
+	printer = {'Gray histogram':['tut',histogram_equalized]}
 	
 	draw(printer)
 
@@ -18,9 +19,12 @@ def draw(printer):
 	plt.figure(figsize=(20,20))
 	i=1
 	for key,value in printer.items():
-		plt.subplot(2,n,i)
+		plt.subplot(n,2,i)
 		i=i+1
-		plt.imshow(value,cmap='gray')
+		if value[0]=='image':
+			plt.imshow(value[1],cmap='gray')
+		else:
+			plt.plot(value[1])
 		plt.title(key)
 	plt.show()
 		
