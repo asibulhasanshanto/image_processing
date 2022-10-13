@@ -4,10 +4,11 @@ from matplotlib import pyplot as plt
 
 # loading image
 #img0 = cv2.imread('SanFrancisco.jpg',)
-img0 = cv2.imread('image3.jpg',)
+img0 = plt.imread('image3.jpg')
+print(img0)
 
 # converting to gray scale
-gray = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
+gray = cv2.cvtColor(img0, cv2.COLOR_RGB2GRAY)
 
 # remove noise
 img = cv2.GaussianBlur(gray,(3,3),0)

@@ -15,15 +15,16 @@ def main():
     title_set = ['Grayscale', 'Histogram calcHist']
     types = ['image', 'hist']
 
-    y_axes_values = np.zeros((1,256),dtype=np.uint32)
-    y_axes_values = y_axes_values.flatten()
+    y_axes_values = np.zeros(256,dtype=np.uint32)
+    print(y_axes_values.shape)
+    # y_axes_values = y_axes_values.flatten()
 
     i,j = gray_image.shape
 
     # create histogram manually
-    for x in range(j):
-        for y in range(i):
-            y_axes_values[gray_image[x,y]] += 1
+    for x in range(i):
+        for y in range(j):
+            y_axes_values[gray_image[x,y]] = y_axes_values[gray_image[x,y]] + 1
     
     fig_set.append(y_axes_values)
     title_set.append('Histogram manually')
