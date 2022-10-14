@@ -4,11 +4,13 @@ import numpy as np
 
 def main():
     # path = './image2.png'
-    path = './image.jpg'
+    path = './sunflower.jpg'
     image = plt.imread(path)
 
     gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     # print(gray_image.shape)
+
+    # create histogram using openCV
     hist_grayscale = cv2.calcHist([gray_image],[0],None,[256],[0,256])
 
     fig_set = [gray_image, hist_grayscale]
@@ -16,85 +18,73 @@ def main():
     types = ['image', 'hist']
 
     y_axes_values = np.zeros(256,dtype=np.uint32)
-    print(y_axes_values.shape)
-    # y_axes_values = y_axes_values.flatten()
-
-    i,j = gray_image.shape
 
     # create histogram manually
+    i,j = gray_image.shape
     for x in range(i):
         for y in range(j):
-            y_axes_values[gray_image[x,y]] = y_axes_values[gray_image[x,y]] + 1
+            y_axes_values[gray_image[x,y]] +=1
+    
+
     
     fig_set.append(y_axes_values)
     title_set.append('Histogram manually')
     types.append('hist')
 
-    # neighbourhood processing
+    # neighbourhood processing manually
     # =============================
 
     # create the kernel 
-    kernel = np.array([[0,0,0],[0,-1,0],[0,0,0]])
-    extra_size = int(kernel.shape[0]-1)
-    # print(extra_size)
+    kernel = np.array([[3,4,5],[0,0,0],[-3,-4,-5]])
 
-    shell_img = np.zeros((i+extra_size,j+extra_size),dtype=np.uint8)
+    # create new row and column
+    row_o,col_o = gray_image.shape
+    kernel_row,kernel_col = kernel.shape
 
-    # copy the image to the shell
-    for x in range(extra_size,i-extra_size):
-        for y in range(extra_size,j-extra_size):
-            shell_img[x,y] = gray_image[x,y]
-    
-    # sum of kernel wieights
-    sum_kernel = np.sum(kernel)
-    
-    #apply the mask to the shell image
-    for x in range(extra_size,i-extra_size):
-        for y in range(extra_size,j-extra_size):
-            m=0
-            for j in range(-1,1):
-                n=0
-                temp = 0
-                for i in range(-1,1):
-                    temp = temp + kernel[m,n]*shell_img[x+i,y+j]
-                    n+=1
-                m+=1
-            shell_img[x,y] =temp/sum_kernel
-            
-    #==========================================
+    new_row = row_o + kernel_row - 1
+    new_col = col_o + kernel_col - 1
 
-    # sorry mam, there is an bug in my code and i dont have enough time to fix it at this moment. I would fix it as soon as possible.
-    
-    #
-    
-    #
-    #
-                    
-    
-    # processed_by_filter = cv2.filter2D(gray_image, -1, kernel)
-    # fig_set.append(processed_by_filter)
-    # title_set.append('Processed by filter')
-    # types.append('image')
+    # zero padding
+    zero_padding = np.zeros((new_row, new_col), dtype=np.uint8)
+    r, c = int(kernel_row/2), int(kernel_col/2)
+    zero_padding[r:r+row_o, c:c+col_o] = gray_image
+    processed_image = np.zeros((row_o, col_o), dtype=np.uint8)
 
-    # # print(shell_img)
-    # fig_set.append(shell_img)
-    # title_set.append('Shell image')
-    # types.append('image')
+    # convolution
+    for x in range(row_o):
+        for y in range(col_o):
+            mat = zero_padding[x:x+kernel_row, y:y+kernel_col]
+            val = np.sum(np.multiply(mat, kernel))
+            if val < 0:
+                processed_image[x,y] = 0
+            elif val > 255:
+                processed_image[x,y] = 255
+            else:
+                processed_image[x,y] = val
+    
+    fig_set.append(processed_image)
+    title_set.append('Neighbourhood processing manually')
+    types.append('image')
 
+    # use opencv filter2D
+    neighbourhood_processed_cv2 = cv2.filter2D(gray_image, -1, kernel)
+    fig_set.append(neighbourhood_processed_cv2)
+    title_set.append('Neighbourhood processing cv2')
+    types.append('image')
     
     plot_func(types,fig_set,title_set)
 
 def plot_func(types,set,title):
     n = len(set)
-    plt.figure(figsize = (20, 20))
     for i in range(n):
-        plt.subplot(3,3,i+1)
+        plt.figure(figsize = (15, 10))
+        # plt.subplot(3,3,i+1)
         if types[i] == 'image':
             plt.imshow(set[i],cmap='gray')
         else:
             plt.plot(set[i])
         plt.title(title[i])
-    plt.savefig('./output.jpg')
+        plt.savefig('./'+title[i]+'.jpg')
     
 
 main()
