@@ -5,7 +5,7 @@ import math
 
 
 def main():
-    rgb = cv2.imread('image1.jpg')
+    rgb = cv2.imread('a.jpeg')
 
     grayscale = rgb_to_grayscale(rgb)
     result = hist_equal(grayscale)
@@ -18,11 +18,11 @@ def main():
 
 def plot_img(img_set, title_set):
     n = len(img_set)
-    plt.figure(figsize=(20, 20))
 
     plot_number = 1
     for i in range(n):
-        plt.subplot(2, 2, plot_number)
+        # plt.subplot(2, 2, plot_number)
+        plt.figure(figsize=(10, 15))
         plt.title(title_set[i])
 
         ch = len(img_set[i].shape)
@@ -31,7 +31,8 @@ def plot_img(img_set, title_set):
         else:
             plt.imshow(img_set[i], cmap='gray')
 
-        plt.subplot(2, 2, plot_number + 1)
+        plt.savefig('./output_'+str(i) +'.png')
+        # plt.subplot(2, 2, plot_number + 1)
         plt.hist(img_set[i].ravel(), 256, [0, 256])
         plt.title(title_set[i] + ' Histogram')
         plt.xlabel('Intensity')
@@ -39,7 +40,6 @@ def plot_img(img_set, title_set):
 
         plot_number += 2
 
-    plt.show()
 
 
 def rgb_to_grayscale(rgb):
