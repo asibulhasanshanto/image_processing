@@ -5,7 +5,7 @@ import numpy as np
 
 def main():
     '''Reading image'''
-    rgb = plt.imread('image3.jpg')
+    rgb = plt.imread('sunflower2.jpg')
     print('Image shape: ', rgb.shape)
 
     grayscale = rgb_to_grayscale(rgb)

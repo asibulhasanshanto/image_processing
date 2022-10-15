@@ -1,3 +1,4 @@
+from cv2 import equalizeHist
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
@@ -5,12 +6,30 @@ import math
 
 
 def main():
-    rgb = cv2.imread('a.jpeg')
+    rgb = cv2.imread('sunflower.jpg')
+    print(rgb.shape)
+    grayscale = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
+    result = cv2.equalizeHist(grayscale)
 
-    grayscale = rgb_to_grayscale(rgb)
-    result = hist_equal(grayscale)
+    # create histogram
+    hist = cv2.calcHist([grayscale], [0], None, [256], [0, 256])
+    equalizedhist = cv2.calcHist([result], [0], None, [256], [0, 256])
+    
+    # plot histogram
+    plt.figure(figsize=(15, 10))
+    plt.plot(hist, color='r')
+    plt.title('Normal Image Histogram')
+    plt.xlabel('Intensity')
+    plt.ylabel('Number of pixels')
+    plt.savefig('histogram.png')
+    plt.figure(figsize=(15, 10))
+    plt.plot(equalizedhist, color='b')
+    plt.title('Equalized Histogram')
+    plt.xlabel('Intensity')
+    plt.ylabel('Number of pixels')
+    plt.savefig('histogram_equalized.png')
 
-    img_set = [rgb, result]
+    img_set = [grayscale, result]
     title_set = ['Original Image', 'Equalize Image']
 
     plot_img(img_set, title_set)
@@ -22,7 +41,7 @@ def plot_img(img_set, title_set):
     plot_number = 1
     for i in range(n):
         # plt.subplot(2, 2, plot_number)
-        plt.figure(figsize=(10, 15))
+        plt.figure(figsize=(15, 10))
         plt.title(title_set[i])
 
         ch = len(img_set[i].shape)
@@ -31,7 +50,7 @@ def plot_img(img_set, title_set):
         else:
             plt.imshow(img_set[i], cmap='gray')
 
-        plt.savefig('./output_'+str(i) +'.png')
+        plt.savefig('./'+title_set[i] +'.png')
         # plt.subplot(2, 2, plot_number + 1)
         plt.hist(img_set[i].ravel(), 256, [0, 256])
         plt.title(title_set[i] + ' Histogram')
